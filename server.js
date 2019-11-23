@@ -26,16 +26,28 @@ app.get("/api/hello", function(req, res) {
 app.get("/api/timestamp/:dateString?", function(req, res) {
   let dateString = req.params.dateString;
   let date = new Date();
-  let unixTime = null;
-  let utcTime = "Invalid Date";
+  let unixTime = date.getTime();
+  let utcTime = date.toUTCString();
 
-  if (dateString) {
+  if (dateString != undefined) {
     date = new Date(dateString);
     unixTime = date.getTime();
     utcTime = date.toUTCString();
   }
 
+  if (dateString != undefined && date == "Invalid Date") {
+    date = new Date(dateString * 1000);
+    unixTime = date.getTime() / 1000;
+    utcTime = date.toUTCString();
+  }
+
+  if (!unixTime) {
+    res.json({error: 'Invalid Date'});
+    return;
+  }
+
   res.json({ unix: unixTime, utc: utcTime });
+
 });
 
 // listen for requests :)
